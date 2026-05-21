@@ -1,0 +1,124 @@
+pipeline {
+    agent any
+
+    environment {
+        // === CUSTOMIZE THESE ===
+        BACKEND_IMAGE   = "<YOUR_DOCKER_REGISTRY>/ammax-backend"
+        FRONTEND_IMAGE  = "<YOUR_DOCKER_REGISTRY>/ammax-frontend"
+
+        // GitOps repo (where ArgoCD Application points)
+        GITOPS_REPO     = "<YOUR_GITOPS_REPO_URL>"   // e.g. https://github.com/yourorg/ammax-deployment.git
+
+        // Source code repo (the app you build)
+        SOURCE_REPO     = "<YOUR_SOURCE_REPO_URL>"   // e.g. https://github.com/yourorg/.git
+        SOURCE_BRANCH   = "main"                     // change to master if needed
+    }
+
+    stages {
+
+        stage('Checkout Source Code') {
+            steps {
+                git branch: "${env.SOURCE_BRANCH}",
+                    url: "${env.SOURCE_REPO}"
+            }
+        }
+
+        stage('Generate Build Tag') {
+            steps {
+                script {
+                    env.TAG = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    echo "📦 Build TAG: ${env.TAG}"
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                sh """
+                    docker build -t $BACKEND_IMAGE:$TAG ./server
+                    docker build -t $FRONTEND_IMAGE:$TAG ./client
+                """
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-cred',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh """
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    """
+                }
+            }
+        }
+
+        stage('Push Docker Images') {
+            steps {
+                sh """
+                    docker push $BACKEND_IMAGE:$TAG
+                    docker push $FRONTEND_IMAGE:$TAG
+                """
+            }
+        }
+
+        // =============================================
+        // GitOps Update Stage (ArgoCD trigger)
+        // User will customize this part themselves
+        // =============================================
+        stage('Update GitOps Repo (ArgoCD Trigger)') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'github-cred',   // rename credential if using different provider
+                    usernameVariable: 'GIT_USER',
+                    passwordVariable: 'GIT_TOKEN'
+                )]) {
+                    sh """
+                        rm -rf gitops
+                        # IMPORTANT: User should adjust this clone line according to their Git provider
+                        # Example for GitHub: git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/yourorg/ammax-deployment.git gitops
+                        git clone ${env.GITOPS_REPO} gitops
+
+                        cd gitops/k8s
+
+                        sed -i "s|image: .*backend.*|image: $BACKEND_IMAGE:$TAG|g" backend-deployment.yml
+                        sed -i "s|image: .*frontend.*|image: $FRONTEND_IMAGE:$TAG|g" frontend-deployment.yml
+
+                        git config user.name "jenkins"
+                        git config user.email "jenkins@ci.com"
+
+                        git add .
+                        git commit -m "🚀 deploy: update images to $TAG" || echo "No changes"
+                        git push origin main
+                    """
+                }
+            }
+        }
+
+        stage('Trigger ArgoCD Sync Check') {
+            steps {
+                sh """
+                    echo "Waiting for ArgoCD to sync..."
+                    sleep 10
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ PIPELINE SUCCESS - Build → Push → Deploy Triggered"
+        }
+
+        failure {
+            echo "❌ PIPELINE FAILED - Check logs"
+        }
+
+        always {
+            echo "🧹 Cleaning workspace"
+            cleanWs()
+        }
+    }
+}

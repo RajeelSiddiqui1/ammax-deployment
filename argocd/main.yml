@@ -7,7 +7,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/RajeelSiddiqui1/ammax-deployment.git
+    repoURL: <YOUR_GITOPS_REPO_URL>   # e.g. https://github.com/yourorg/ammax-deployment.git or your GitLab/Gitea URL
     targetRevision: main
     path: k8s
 

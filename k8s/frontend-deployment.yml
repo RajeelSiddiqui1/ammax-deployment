@@ -19,7 +19,7 @@ spec:
   spec: 
     containers: 
     - name: frontend-container
-      image: rajeel/ammax-frontend:2157403
+      image: frontend/image
       env:
       - name: VITE_BRAND_NAME
         valueFrom:

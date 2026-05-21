@@ -1,0 +1,17 @@
+# Kubernetes secrets (never commit real credentials)
+
+
+# Environment files
+.env
+.env.*
+*.env
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Logs / temp
+*.log
+tmp/
