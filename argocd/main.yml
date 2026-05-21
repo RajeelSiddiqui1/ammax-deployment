@@ -3,8 +3,9 @@ kind: Application
 metadata:
   name: fullstack-app
   namespace: argocd
+
 spec:
-  project: default
+  project: ammax-project
 
   source:
     repoURL: https://github.com/RajeelSiddiqui1/ammax-deployment.git
@@ -19,5 +20,6 @@ spec:
     automated:
       prune: true
       selfHeal: true
+
     syncOptions:
       - CreateNamespace=true
