@@ -12,4 +12,9 @@ spec:
     name: mongodb-deployment
 
   updatePolicy:
-    updateMode: "Auto"
+    updateMode: "Off"
+  
+  resourcePolicy:
+    containerPolicies:
+    - containerName: "*"
+      controlledResources: ["cpu", "memory"]
