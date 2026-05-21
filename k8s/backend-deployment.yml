@@ -22,7 +22,7 @@ spec:
 
       containers:
         - name: backend-container
-          image: alifarhan3311/ammax-backend:latest
+          image: rajeel/ammax-backend:2157403
           env:
            - name: PORT
              valueFrom:
