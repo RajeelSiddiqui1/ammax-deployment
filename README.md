@@ -67,7 +67,7 @@ ArgoCD continuously monitors the GitOps repository and automatically deploys cha
 GitOps Repo → ArgoCD → Kubernetes Cluster
 ```
 
-![ArgoCD](https://res.cloudinary.com/dqjjreavg/image/upload/v1779388076/pd2j1btkg5ued7dgevxy.png)
+![ArgoCD](https://res.cloudinary.com/dqjjreavg/image/upload/v1779388085/e0vg0y7mhirggcvesq7f.jpg)
 
 ---
 
