@@ -101,7 +101,7 @@ pipeline {
             steps {
                 sh """
                     echo "Waiting for ArgoCD to sync..."
-                    sleep 10
+                    sleep 12
                 """
             }
         }
