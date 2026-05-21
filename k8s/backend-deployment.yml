@@ -6,7 +6,7 @@ metadata:
   namespace: ammax
 
 spec:
-  replicas: 5
+  replicas: 10
   selector:
     matchLabels:
       app: backend
