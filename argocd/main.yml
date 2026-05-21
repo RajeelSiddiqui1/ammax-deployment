@@ -3,9 +3,8 @@ kind: Application
 metadata:
   name: fullstack-app
   namespace: argocd
-
 spec:
-  project: ammax-project
+  project: default
 
   source:
     repoURL: https://github.com/RajeelSiddiqui1/ammax-deployment.git
@@ -14,12 +13,11 @@ spec:
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: ammax-project
+    namespace: default
 
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-
     syncOptions:
       - CreateNamespace=true
