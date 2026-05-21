@@ -215,8 +215,5 @@ This project demonstrates:
 ## 👨‍💻 Author
 
 **Rajeel Siddiqui**
-DevOps & Frontend Developer
+DevOps Engineer
 
----
-
-🔥 Bas ab isko paste karo GitHub me — ye **100% professional DevOps portfolio README** hai.
