@@ -1,0 +1,17 @@
+kind: PersistentVolume
+apiVersion: v1
+
+metadata:
+ name: uploads-pv
+ namespace: ammax
+
+spec:
+ capacity:
+  storage: 10Gi
+
+ accessModes:
+ - ReadWriteOnce
+ storageClassName: manual
+ persistentVolumeReclaimPolicy: Retain
+ hostPath:
+  path: /data/uploads-backup  

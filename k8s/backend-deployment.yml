@@ -1,0 +1,101 @@
+kind: Deployment
+apiVersion: apps/v1
+
+metadata:
+  name: backend-deployment
+  namespace: ammax
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+
+  template:
+    metadata:
+      labels:
+        app: backend
+
+    spec:
+      securityContext:
+        fsGroup: 1000
+
+      containers:
+        - name: backend-container
+          image: alifarhan3311/ammax-backend:latest
+          env:
+           - name: PORT
+             valueFrom:
+              secretKeyRef:
+               name: secrets
+               key: port
+           - name: MONGO_URI
+             valueFrom:
+              secretKeyRef:
+               name: secrets
+               key: mongodb-uri   
+           - name: JWT_SECRET
+             valueFrom:
+              secretKeyRef:
+               name: secrets
+               key: jwt-secret
+           - name: brandName
+             valueFrom:
+              secretKeyRef:
+               name: secrets
+               key: brandName   
+           - name: AMPRE_BASE_URL
+             valueFrom:
+              secretKeyRef:
+               name: secrets
+               key: amper-base-url
+           - name: DLA_TOKEN
+             valueFrom:
+              secretKeyRef:
+               name: secrets
+               key: dla-token  
+           - name: VOW_TOKEN
+             valueFrom:
+              secretKeyRef:
+               name: secrets
+               key: vow-token  
+           - name: IDX_TOKEN
+             valueFrom:
+              secretKeyRef:
+               name: secrets
+               key: idex-token  
+           - name: EMAIL_HOST
+             valueFrom:
+              secretKeyRef:
+               name: secrets
+               key: email-host
+           - name: EMAIL_USER
+             valueFrom:
+              secretKeyRef:
+               name: secrets
+               key: email-user
+           - name: EMAIL_PASS
+             valueFrom:
+              secretKeyRef:
+               name: secrets
+               key: email-pass
+               
+          ports:
+            - containerPort: 4000
+
+          resources:
+            requests:
+              cpu: "300m"
+              memory: "628Mi"
+            limits:
+              cpu: "600m"
+              memory: "1Gi"
+
+          volumeMounts:
+            - name: upload-storage
+              mountPath: /data/uploads
+
+      volumes:
+        - name: upload-storage
+          persistentVolumeClaim:
+            claimName: uploads-pvc

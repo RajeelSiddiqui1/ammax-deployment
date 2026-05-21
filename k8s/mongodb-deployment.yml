@@ -1,0 +1,46 @@
+kind: StatefulSet
+apiVersion: apps/v1
+
+metadata:
+  name: mongodb-deployment
+  namespace: ammax
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  serviceName: mongodb-svc
+
+  template:
+    metadata:
+      labels:
+        app: mongodb
+
+    spec:
+      containers:
+      - name: mongodb-container
+        image: mongo:7
+        ports:
+        - containerPort: 27017
+        env:
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: secrets
+                key: mongo-user
+
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: secrets
+                key: mongo-pass
+
+        volumeMounts:
+        - name: mongo-data
+          mountPath: /data/db
+
+      volumes:
+      - name: mongo-data
+        persistentVolumeClaim:
+          claimName: mongo-pvc

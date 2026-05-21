@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+
+metadata:
+  name: mongodb-svc
+  namespace: ammax
+
+spec:
+  selector:
+    app: mongodb
+  ports:
+    - protocol: TCP
+      port: 27018
+      targetPort: 27017

@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ammax-ingress
+  namespace: ammax
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+spec:
+  ingressClassName: nginx # <--- YEH LINE CRITICAL HAI, IS SE CLASS ACTIVE HOGI
+  rules:
+  - host: ammax.ca
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-svc
+            port:
+              number: 80
+  - host: api.ammax.ca
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-svc
+            port:
+              number: 4000

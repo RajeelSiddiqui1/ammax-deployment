@@ -1,0 +1,15 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+
+metadata: 
+ name: uploads-pvc
+ namespace: ammax
+
+spec:
+ accessModes:
+ - ReadWriteOnce
+ storageClassName: manual
+ resources: 
+  requests:
+   storage: 10Gi
+ volumeName: uploads-pv  
