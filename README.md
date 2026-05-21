@@ -38,7 +38,7 @@ Kubernetes Cluster Deployment
 
 ## 📊 Architecture Diagram
 
-![Architecture](docs/images/architecture.png)
+![Architecture](https://res.cloudinary.com/dqjjreavg/image/upload/v1779388076/pd2j1btkg5ued7dgevxy.png)
 
 ---
 
@@ -55,7 +55,7 @@ The Jenkins pipeline automates the full delivery process:
 * ✔ Update GitOps Repository
 * ✔ Trigger ArgoCD Sync
 
-![Jenkins Pipeline](docs/images/jenkins.png)
+![Jenkins Pipeline](https://res.cloudinary.com/dqjjreavg/image/upload/v1779388090/ji1kd57hyrii2aljvwu0.jpg)
 
 ---
 
@@ -67,7 +67,7 @@ ArgoCD continuously monitors the GitOps repository and automatically deploys cha
 GitOps Repo → ArgoCD → Kubernetes Cluster
 ```
 
-![ArgoCD](docs/images/argocd.png)
+![ArgoCD](https://res.cloudinary.com/dqjjreavg/image/upload/v1779388076/pd2j1btkg5ued7dgevxy.png)
 
 ---
 
@@ -89,7 +89,7 @@ GitOps Repo → ArgoCD → Kubernetes Cluster
 * Grafana → Dashboards & visualization
 * Node Exporter → System-level metrics
 
-![Monitoring](docs/images/monitoring.png)
+![Monitoring](https://res.cloudinary.com/dqjjreavg/image/upload/v1779388095/c5o9to6oyrj1ackeavxt.jpg)
 
 ---
 
@@ -197,7 +197,7 @@ argocd app sync ammax-app
 
 | Jenkins                             | ArgoCD                            | Monitoring                                |
 | ----------------------------------- | --------------------------------- | ----------------------------------------- |
-| ![Jenkins](docs/images/jenkins.png) | ![ArgoCD](docs/images/argocd.png) | ![Monitoring](docs/images/monitoring.png) |
+| ![Jenkins](https://res.cloudinary.com/dqjjreavg/image/upload/v1779388090/ji1kd57hyrii2aljvwu0.jpg) | ![ArgoCD](https://res.cloudinary.com/dqjjreavg/image/upload/v1779388085/e0vg0y7mhirggcvesq7f.jpg) | ![Monitoring](https://res.cloudinary.com/dqjjreavg/image/upload/v1779388095/c5o9to6oyrj1ackeavxt.jpg) |
 
 ---
 
