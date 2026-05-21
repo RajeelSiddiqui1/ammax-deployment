@@ -4,7 +4,7 @@ metadata:
   name: fullstack-app
   namespace: argocd
 spec:
-  project: ammax-project
+  project: default
 
   source:
     repoURL: https://github.com/RajeelSiddiqui1/ammax-deployment.git
