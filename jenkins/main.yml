@@ -2,24 +2,21 @@ pipeline {
     agent any
 
     environment {
-        // === CUSTOMIZE THESE ===
-        BACKEND_IMAGE   = "<YOUR_DOCKER_REGISTRY>/ammax-backend"
-        FRONTEND_IMAGE  = "<YOUR_DOCKER_REGISTRY>/ammax-frontend"
-
-        // GitOps repo (where ArgoCD Application points)
-        GITOPS_REPO     = "<YOUR_GITOPS_REPO_URL>"   // e.g. https://github.com/yourorg/ammax-deployment.git
-
-        // Source code repo (the app you build)
-        SOURCE_REPO     = "<YOUR_SOURCE_REPO_URL>"   // e.g. https://github.com/yourorg/.git
-        SOURCE_BRANCH   = "main"                     // change to master if needed
+        BACKEND_IMAGE = "username/docker-image"
+        FRONTEND_IMAGE = "username/docker-image"
+        
+        // URL interpolation sahi rakhne ke liye yahan se https:// hata diya hai
+        GITOPS_REPO   = "github.com/username/reponame.git"
+        REPO_NAME     = "repo-name"
     }
 
     stages {
 
         stage('Checkout Source Code') {
             steps {
-                git branch: "${env.SOURCE_BRANCH}",
-                    url: "${env.SOURCE_REPO}"
+                git branch: 'name',
+                    credentialsId: 'github-cred',
+                    url: 'https://github.com/username/repo.git'
             }
         }
 
@@ -35,8 +32,8 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 sh """
-                    docker build -t $BACKEND_IMAGE:$TAG ./server
-                    docker build -t $FRONTEND_IMAGE:$TAG ./client
+                    docker build -t ${BACKEND_IMAGE}:${TAG} ./server
+                    docker build -t ${FRONTEND_IMAGE}:${TAG} ./client
                 """
             }
         }
@@ -49,7 +46,7 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh """
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
                     """
                 }
             }
@@ -58,41 +55,38 @@ pipeline {
         stage('Push Docker Images') {
             steps {
                 sh """
-                    docker push $BACKEND_IMAGE:$TAG
-                    docker push $FRONTEND_IMAGE:$TAG
+                    docker push ${BACKEND_IMAGE}:${TAG}
+                    docker push ${FRONTEND_IMAGE}:${TAG}
                 """
             }
         }
 
-        // =============================================
-        // GitOps Update Stage (ArgoCD trigger)
-        // User will customize this part themselves
-        // =============================================
         stage('Update GitOps Repo (ArgoCD Trigger)') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'github-cred',   // rename credential if using different provider
+                    credentialsId: 'github-cred',
                     usernameVariable: 'GIT_USER',
                     passwordVariable: 'GIT_TOKEN'
                 )]) {
-                    sh """
-                        rm -rf gitops
-                        # IMPORTANT: User should adjust this clone line according to their Git provider
-                        # Example for GitHub: git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/yourorg/ammax-deployment.git gitops
-                        git clone ${env.GITOPS_REPO} gitops
+                    // Single quotes use karne se Groovy string interpolation warning nahi aayegi
+                    sh '''
+                        rm -rf ${REPO_NAME}
+                        
+                        # Ab URL bilkul sahi format (https://username:token@github.com/...) me banega
+                        git clone https://${GIT_USER}:${GIT_TOKEN}@${GITOPS_REPO} ${REPO_NAME}
+                        
+                        cd ${REPO_NAME}/k8s
 
-                        cd gitops/k8s
-
-                        sed -i "s|image: .*backend.*|image: $BACKEND_IMAGE:$TAG|g" backend-deployment.yml
-                        sed -i "s|image: .*frontend.*|image: $FRONTEND_IMAGE:$TAG|g" frontend-deployment.yml
+                        sed -i "s|image: .*backend.*|image: ${BACKEND_IMAGE}:${TAG}|g" backend-deployment.yml
+                        sed -i "s|image: .*frontend.*|image: ${FRONTEND_IMAGE}:${TAG}|g" frontend-deployment.yml
 
                         git config user.name "jenkins"
                         git config user.email "jenkins@ci.com"
 
                         git add .
-                        git commit -m "🚀 deploy: update images to $TAG" || echo "No changes"
+                        git commit -m "🚀 deploy: update images to ${TAG}" || echo "No changes"
                         git push origin main
-                    """
+                    '''
                 }
             }
         }
@@ -100,8 +94,8 @@ pipeline {
         stage('Trigger ArgoCD Sync Check') {
             steps {
                 sh """
-                    echo "Waiting for ArgoCD to sync..."
-                    sleep 12
+                    echo "Waiting for ArgoCD sync..."
+                    sleep 10
                 """
             }
         }
@@ -109,7 +103,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ PIPELINE SUCCESS - Build → Push → Deploy Triggered"
+            echo "✅ PIPELINE SUCCESS - Build → Push → GitOps Updated"
         }
 
         failure {
@@ -117,7 +111,6 @@ pipeline {
         }
 
         always {
-            echo "🧹 Cleaning workspace"
             cleanWs()
         }
     }
