@@ -110,12 +110,6 @@ GitOps Repo → ArgoCD → Kubernetes Cluster
 │   ├── secret.yml
 │   ├── hpa.yml
 │   ├── vpa.yml
-├── docs/
-│   └── images/
-│       ├── architecture.png
-│       ├── jenkins.png
-│       ├── argocd.png
-│       ├── monitoring.png
 └── README.md
 ```
 
